@@ -1,0 +1,6 @@
+git init
+git add .
+git commit -m "Initial commit — Shell project"
+git branch -M main
+git remote add origin https://github.com/mandyharbin/SHELL.git
+git push -u origin main
