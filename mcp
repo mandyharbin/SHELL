@@ -1,1 +1,6 @@
 https://mcp.supabase.com/mcp?project_ref=zulssgbjflsfkcaozvzu
+[features]
+experimental_use_rmcp_client = true
+ 
+[mcp_servers.figma-mcp]
+url = "https://mcp.figma.com/mcp"
