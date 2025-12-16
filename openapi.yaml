@@ -287,6 +287,9 @@ components:
               type: object
               nullable: true
               description: Info needed for routing ticket.
+            handover_reason:
+              $ref: "#/components/schemas/HandoverReason"
+              description: Reason for handover when action is ROUTE_PROMPT or ROUTE_AUTOSEND.
         audit_event_id:
           type: string
 
@@ -343,7 +346,7 @@ components:
         confidence:
           type: number
         action:
-          type: string
+          $ref: "#/components/schemas/ActionType"
         details:
           type: object
           nullable: true
