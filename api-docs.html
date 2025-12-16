@@ -4,515 +4,392 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AHP Guardrail Engine API Documentation</title>
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css">
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-        .topbar {
-            display: none;
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
         }
-        #swagger-ui {
-            max-width: 1460px;
+        
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .information-container {
-            background: #f8f9fa;
+        
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-left: 4px solid #1a73e8;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        
+        h2 {
+            color: #1a73e8;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .endpoint {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
             padding: 20px;
             margin-bottom: 20px;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
             border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+        
+        .method.get {
+            background: #61affe;
+            color: white;
+        }
+        
+        .method.post {
+            background: #49cc90;
+            color: white;
+        }
+        
+        .path {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .description {
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        .schema {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .schema-name {
+            font-weight: bold;
+            color: #1a73e8;
+            margin-bottom: 10px;
+        }
+        
+        .property {
+            margin-left: 20px;
+            padding: 5px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .required {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        
+        .enum {
+            background: #fff3e0;
+            padding: 10px;
+            border-left: 3px solid #ff9800;
+            margin: 10px 0;
+        }
+        
+        .enum-value {
+            display: inline-block;
+            background: white;
+            padding: 3px 8px;
+            margin: 3px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 3px 10px;
+            border-radius: 3px;
+            margin: 5px 5px 5px 0;
+            font-size: 0.85em;
+        }
+        
+        .online-link {
+            background: #4caf50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .online-link:hover {
+            background: #45a049;
         }
     </style>
 </head>
 <body>
-    <div id="swagger-ui"></div>
-    
-    <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
-    <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
-    <script>
-        window.onload = function() {
-            // OpenAPI Specification embedded inline
-            const spec = {
-                "openapi": "3.1.0",
-                "info": {
-                    "title": "AHP Guardrail Engine API",
-                    "description": "Central policy enforcement engine for the AHP Patient-Facing AI Assistant.\nHandles consent verification, emergency detection, forbidden intent classification,\nrouting determination, pre-LLM sanitization, post-LLM validation, and audit event creation.\n",
-                    "version": "1.0.0",
-                    "contact": {
-                        "name": "AHP Platform Team"
-                    }
-                },
-                "servers": [
-                    {
-                        "url": "https://api.ahp.internal",
-                        "description": "Internal cluster"
-                    }
-                ],
-                "tags": [
-                    {"name": "Guardrails"},
-                    {"name": "Emergency Detection"},
-                    {"name": "Consent"},
-                    {"name": "Routing"},
-                    {"name": "Audit"},
-                    {"name": "EHR Read-Only"}
-                ],
-                "paths": {
-                    "/v1/consent/verify": {
-                        "get": {
-                            "tags": ["Consent"],
-                            "summary": "Verify whether user has granted data-backed AI consent.",
-                            "operationId": "verifyConsent",
-                            "parameters": [
-                                {
-                                    "in": "query",
-                                    "name": "patient_id",
-                                    "required": true,
-                                    "schema": {
-                                        "type": "string"
-                                    }
-                                }
-                            ],
-                            "responses": {
-                                "200": {
-                                    "description": "Consent verification result.",
-                                    "content": {
-                                        "application/json": {
-                                            "schema": {
-                                                "$ref": "#/components/schemas/ConsentResponse"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "/v1/emergency/detect": {
-                        "post": {
-                            "tags": ["Emergency Detection"],
-                            "summary": "Detect whether a message is an emergency using rules + ML.",
-                            "operationId": "detectEmergency",
-                            "requestBody": {
-                                "required": true,
-                                "content": {
-                                    "application/json": {
-                                        "schema": {
-                                            "$ref": "#/components/schemas/EmergencyDetectRequest"
-                                        }
-                                    }
-                                }
-                            },
-                            "responses": {
-                                "200": {
-                                    "description": "Emergency detection result.",
-                                    "content": {
-                                        "application/json": {
-                                            "schema": {
-                                                "$ref": "#/components/schemas/EmergencyDetectResponse"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "/v1/guardrail/check": {
-                        "post": {
-                            "tags": ["Guardrails"],
-                            "summary": "Run full guardrail decision pipeline: consent check → emergency → forbidden → routing → allowed recommendation.",
-                            "operationId": "guardrailCheck",
-                            "requestBody": {
-                                "required": true,
-                                "content": {
-                                    "application/json": {
-                                        "schema": {
-                                            "$ref": "#/components/schemas/GuardrailCheckRequest"
-                                        }
-                                    }
-                                }
-                            },
-                            "responses": {
-                                "200": {
-                                    "description": "Guardrail decision output.",
-                                    "content": {
-                                        "application/json": {
-                                            "schema": {
-                                                "$ref": "#/components/schemas/GuardrailCheckResponse"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "/v1/routing/create": {
-                        "post": {
-                            "tags": ["Routing"],
-                            "summary": "Create a routing ticket for staff inbox.",
-                            "operationId": "createRoutingTicket",
-                            "requestBody": {
-                                "required": true,
-                                "content": {
-                                    "application/json": {
-                                        "schema": {
-                                            "$ref": "#/components/schemas/RoutingCreateRequest"
-                                        }
-                                    }
-                                }
-                            },
-                            "responses": {
-                                "200": {
-                                    "description": "Routing ticket created.",
-                                    "content": {
-                                        "application/json": {
-                                            "schema": {
-                                                "$ref": "#/components/schemas/RoutingCreateResponse"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "/v1/audit/log": {
-                        "post": {
-                            "tags": ["Audit"],
-                            "summary": "Submit a signed audit event.",
-                            "operationId": "submitAuditEvent",
-                            "requestBody": {
-                                "required": true,
-                                "content": {
-                                    "application/json": {
-                                        "schema": {
-                                            "$ref": "#/components/schemas/AuditEvent"
-                                        }
-                                    }
-                                }
-                            },
-                            "responses": {
-                                "200": {
-                                    "description": "Audit entry accepted.",
-                                    "content": {
-                                        "application/json": {
-                                            "schema": {
-                                                "$ref": "#/components/schemas/AuditResponse"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "/ehr/appointments/exists": {
-                        "get": {
-                            "tags": ["EHR Read-Only"],
-                            "summary": "Check if appointment exists for patient.",
-                            "operationId": "appointmentExists",
-                            "parameters": [
-                                {
-                                    "in": "query",
-                                    "name": "patient_id",
-                                    "required": true,
-                                    "schema": {
-                                        "type": "string"
-                                    }
-                                }
-                            ],
-                            "responses": {
-                                "200": {
-                                    "description": "Existence check.",
-                                    "content": {
-                                        "application/json": {
-                                            "schema": {
-                                                "$ref": "#/components/schemas/AppointmentExistsResponse"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "/ehr/prescriptions/exists": {
-                        "get": {
-                            "tags": ["EHR Read-Only"],
-                            "summary": "Check if prescription exists for patient.",
-                            "operationId": "prescriptionExists",
-                            "parameters": [
-                                {
-                                    "in": "query",
-                                    "name": "patient_id",
-                                    "required": true,
-                                    "schema": {
-                                        "type": "string"
-                                    }
-                                }
-                            ],
-                            "responses": {
-                                "200": {
-                                    "description": "Existence check.",
-                                    "content": {
-                                        "application/json": {
-                                            "schema": {
-                                                "$ref": "#/components/schemas/PrescriptionExistsResponse"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "components": {
-                    "schemas": {
-                        "ActionType": {
-                            "type": "string",
-                            "enum": ["EMERGENCY", "BLOCK", "ROUTE_PROMPT", "ROUTE_AUTOSEND", "ALLOW"]
-                        },
-                        "HandoverReason": {
-                            "type": "string",
-                            "enum": [
-                                "No Match Found",
-                                "Low Confidence Match",
-                                "Unsafe Clinical Question",
-                                "Requires Human Review",
-                                "Billing or Account Issue",
-                                "Ambiguous or Multi-Part Question"
-                            ]
-                        },
-                        "ConsentResponse": {
-                            "type": "object",
-                            "properties": {
-                                "consent_granted": {
-                                    "type": "boolean"
-                                },
-                                "consent_id": {
-                                    "type": "string",
-                                    "nullable": true
-                                },
-                                "timestamp": {
-                                    "type": "string",
-                                    "format": "date-time"
-                                }
-                            }
-                        },
-                        "EmergencyDetectRequest": {
-                            "type": "object",
-                            "required": ["patient_id", "text"],
-                            "properties": {
-                                "patient_id": {
-                                    "type": "string"
-                                },
-                                "text": {
-                                    "type": "string"
-                                },
-                                "text_hash": {
-                                    "type": "string",
-                                    "description": "SHA-256 or similar hash, optional."
-                                }
-                            }
-                        },
-                        "EmergencyDetectResponse": {
-                            "type": "object",
-                            "properties": {
-                                "is_emergency": {
-                                    "type": "boolean"
-                                },
-                                "patterns": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                },
-                                "confidence": {
-                                    "type": "number"
-                                },
-                                "text_hash": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "GuardrailCheckRequest": {
-                            "type": "object",
-                            "required": ["patient_id", "text"],
-                            "properties": {
-                                "patient_id": {
-                                    "type": "string"
-                                },
-                                "text": {
-                                    "type": "string"
-                                },
-                                "context": {
-                                    "type": "object",
-                                    "description": "Sanitized context including appointments, meds, practice info, and knowledge hub matches (hashed or redacted where needed)."
-                                },
-                                "message_id": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "GuardrailCheckResponse": {
-                            "type": "object",
-                            "properties": {
-                                "action": {
-                                    "$ref": "#/components/schemas/ActionType"
-                                },
-                                "action_reason": {
-                                    "type": "string"
-                                },
-                                "confidence": {
-                                    "type": "number"
-                                },
-                                "recommendation": {
-                                    "type": "object",
-                                    "nullable": true,
-                                    "properties": {
-                                        "response_text": {
-                                            "type": "string",
-                                            "description": "For ALLOW: sanitized text for LLM or AIRE-approved output. For BLOCK/ROUTE: deterministic message template."
-                                        },
-                                        "route_payload": {
-                                            "type": "object",
-                                            "nullable": true,
-                                            "description": "Info needed for routing ticket."
-                                        },
-                                        "handover_reason": {
-                                            "$ref": "#/components/schemas/HandoverReason",
-                                            "description": "Reason for handover when action is ROUTE_PROMPT or ROUTE_AUTOSEND."
-                                        }
-                                    }
-                                },
-                                "audit_event_id": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "RoutingCreateRequest": {
-                            "type": "object",
-                            "required": ["patient_id", "category", "message_hash"],
-                            "properties": {
-                                "patient_id": {
-                                    "type": "string"
-                                },
-                                "category": {
-                                    "type": "string",
-                                    "description": "e.g., \"scheduling\", \"clinical\", \"billing\""
-                                },
-                                "message_hash": {
-                                    "type": "string"
-                                },
-                                "metadata": {
-                                    "type": "object",
-                                    "nullable": true
-                                }
-                            }
-                        },
-                        "RoutingCreateResponse": {
-                            "type": "object",
-                            "properties": {
-                                "routing_id": {
-                                    "type": "string"
-                                },
-                                "status": {
-                                    "type": "string"
-                                },
-                                "assigned_to": {
-                                    "type": "string",
-                                    "nullable": true
-                                }
-                            }
-                        },
-                        "AuditEvent": {
-                            "type": "object",
-                            "required": ["event_type", "message_id", "timestamp"],
-                            "description": "Signed, tamper-evident event payload.",
-                            "properties": {
-                                "event_type": {
-                                    "type": "string"
-                                },
-                                "patient_id_hash": {
-                                    "type": "string"
-                                },
-                                "message_id": {
-                                    "type": "string"
-                                },
-                                "timestamp": {
-                                    "type": "string",
-                                    "format": "date-time"
-                                },
-                                "patterns": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                },
-                                "confidence": {
-                                    "type": "number"
-                                },
-                                "action": {
-                                    "$ref": "#/components/schemas/ActionType"
-                                },
-                                "details": {
-                                    "type": "object",
-                                    "nullable": true
-                                }
-                            }
-                        },
-                        "AuditResponse": {
-                            "type": "object",
-                            "properties": {
-                                "audit_id": {
-                                    "type": "string"
-                                },
-                                "status": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "AppointmentExistsResponse": {
-                            "type": "object",
-                            "properties": {
-                                "exists": {
-                                    "type": "boolean"
-                                },
-                                "date": {
-                                    "type": "string",
-                                    "format": "date",
-                                    "nullable": true
-                                }
-                            }
-                        },
-                        "PrescriptionExistsResponse": {
-                            "type": "object",
-                            "properties": {
-                                "exists": {
-                                    "type": "boolean"
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+    <div class="container">
+        <h1>🛡️ AHP Guardrail Engine API</h1>
+        <p class="subtitle">Version 1.0.0 • Central policy enforcement for Patient-Facing AI Assistant</p>
+        
+        <div class="info-box">
+            <strong>📖 View Interactive Documentation:</strong><br>
+            For full interactive API exploration, upload <code>openapi.yaml</code> to 
+            <a href="https://editor.swagger.io" target="_blank" class="online-link">Swagger Editor →</a>
+        </div>
 
-            // Initialize Swagger UI
-            SwaggerUIBundle({
-                spec: spec,
-                dom_id: '#swagger-ui',
-                deepLinking: true,
-                presets: [
-                    SwaggerUIBundle.presets.apis,
-                    SwaggerUIStandalonePreset
-                ],
-                plugins: [
-                    SwaggerUIBundle.plugins.DownloadUrl
-                ],
-                layout: "StandaloneLayout",
-                defaultModelsExpandDepth: 1,
-                defaultModelExpandDepth: 1,
-                docExpansion: 'list',
-                filter: true,
-                showRequestHeaders: true
-            });
-        }
-    </script>
+        <h2>📋 Overview</h2>
+        <p>Central policy enforcement engine handling consent verification, emergency detection, forbidden intent classification, routing determination, pre-LLM sanitization, post-LLM validation, and audit event creation.</p>
+        
+        <p><strong>Server:</strong> <code>https://api.ahp.internal</code> (Internal cluster)</p>
+
+        <h2>🔌 API Endpoints</h2>
+
+        <h3>🔒 Consent & Safety</h3>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/v1/consent/verify</span>
+                <span class="tag">Consent</span>
+            </div>
+            <div class="description">
+                Verify whether user has granted data-backed AI consent.
+                <div class="schema">
+                    <strong>Query Parameters:</strong>
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> ConsentResponse
+                    <div class="property">• consent_granted (boolean)</div>
+                    <div class="property">• consent_id (string, nullable)</div>
+                    <div class="property">• timestamp (date-time)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/v1/emergency/detect</span>
+                <span class="tag">Emergency Detection</span>
+            </div>
+            <div class="description">
+                Detect whether a message is an emergency using rules + ML.
+                <div class="schema">
+                    <strong>Request Body:</strong> EmergencyDetectRequest
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                    <div class="property"><span class="required">* </span>text (string)</div>
+                    <div class="property">• text_hash (string) - SHA-256 or similar hash</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> EmergencyDetectResponse
+                    <div class="property">• is_emergency (boolean)</div>
+                    <div class="property">• patterns (array of strings)</div>
+                    <div class="property">• confidence (number)</div>
+                    <div class="property">• text_hash (string)</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>🛡️ Core Guardrail Pipeline</h3>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/v1/guardrail/check</span>
+                <span class="tag">Guardrails</span>
+            </div>
+            <div class="description">
+                Run full guardrail decision pipeline: consent check → emergency → forbidden → routing → allowed recommendation.
+                <div class="schema">
+                    <strong>Request Body:</strong> GuardrailCheckRequest
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                    <div class="property"><span class="required">* </span>text (string)</div>
+                    <div class="property">• context (object) - Sanitized context data</div>
+                    <div class="property">• message_id (string)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> GuardrailCheckResponse
+                    <div class="property">• action (ActionType enum)</div>
+                    <div class="property">• action_reason (string)</div>
+                    <div class="property">• confidence (number)</div>
+                    <div class="property">• recommendation (object, nullable)</div>
+                    <div class="property">• audit_event_id (string)</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>📨 Routing & Audit</h3>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/v1/routing/create</span>
+                <span class="tag">Routing</span>
+            </div>
+            <div class="description">
+                Create a routing ticket for staff inbox.
+                <div class="schema">
+                    <strong>Request Body:</strong> RoutingCreateRequest
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                    <div class="property"><span class="required">* </span>category (string) - e.g., "scheduling", "clinical", "billing"</div>
+                    <div class="property"><span class="required">* </span>message_hash (string)</div>
+                    <div class="property">• metadata (object, nullable)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> RoutingCreateResponse
+                    <div class="property">• routing_id (string)</div>
+                    <div class="property">• status (string)</div>
+                    <div class="property">• assigned_to (string, nullable)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/v1/audit/log</span>
+                <span class="tag">Audit</span>
+            </div>
+            <div class="description">
+                Submit a signed audit event (tamper-evident event payload).
+                <div class="schema">
+                    <strong>Request Body:</strong> AuditEvent
+                    <div class="property"><span class="required">* </span>event_type (string)</div>
+                    <div class="property"><span class="required">* </span>message_id (string)</div>
+                    <div class="property"><span class="required">* </span>timestamp (date-time)</div>
+                    <div class="property">• patient_id_hash (string)</div>
+                    <div class="property">• patterns (array of strings)</div>
+                    <div class="property">• confidence (number)</div>
+                    <div class="property">• action (ActionType enum)</div>
+                    <div class="property">• details (object, nullable)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> AuditResponse
+                    <div class="property">• audit_id (string)</div>
+                    <div class="property">• status (string)</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>🏥 EHR Read-Only Adapter</h3>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/ehr/appointments/exists</span>
+                <span class="tag">EHR Read-Only</span>
+            </div>
+            <div class="description">
+                Check if appointment exists for patient.
+                <div class="schema">
+                    <strong>Query Parameters:</strong>
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> AppointmentExistsResponse
+                    <div class="property">• exists (boolean)</div>
+                    <div class="property">• date (date, nullable)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/ehr/prescriptions/exists</span>
+                <span class="tag">EHR Read-Only</span>
+            </div>
+            <div class="description">
+                Check if prescription exists for patient.
+                <div class="schema">
+                    <strong>Query Parameters:</strong>
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> PrescriptionExistsResponse
+                    <div class="property">• exists (boolean)</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>📊 Data Schemas</h2>
+
+        <h3>Enumerations</h3>
+        
+        <div class="enum">
+            <div class="schema-name">ActionType</div>
+            <div>Possible values:</div>
+            <span class="enum-value">EMERGENCY</span>
+            <span class="enum-value">BLOCK</span>
+            <span class="enum-value">ROUTE_PROMPT</span>
+            <span class="enum-value">ROUTE_AUTOSEND</span>
+            <span class="enum-value">ALLOW</span>
+        </div>
+
+        <div class="enum">
+            <div class="schema-name">HandoverReason</div>
+            <div>Possible values:</div>
+            <span class="enum-value">No Match Found</span>
+            <span class="enum-value">Low Confidence Match</span>
+            <span class="enum-value">Unsafe Clinical Question</span>
+            <span class="enum-value">Requires Human Review</span>
+            <span class="enum-value">Billing or Account Issue</span>
+            <span class="enum-value">Ambiguous or Multi-Part Question</span>
+        </div>
+
+        <h2>🚀 Getting Started</h2>
+        <p>See <code>API_USAGE_GUIDE.md</code> for detailed instructions on:</p>
+        <ul style="margin-left: 40px; margin-top: 10px;">
+            <li>Generating API clients in multiple languages</li>
+            <li>Creating server stubs</li>
+            <li>Running mock servers for testing</li>
+            <li>Viewing full interactive documentation</li>
+        </ul>
+
+    </div>
 </body>
 </html>
