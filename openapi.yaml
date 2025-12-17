@@ -37,6 +37,7 @@ paths:
           required: true
           schema:
             type: string
+          example: "PT-2024-001234"
       responses:
         '200':
           description: Consent verification result.
@@ -59,6 +60,10 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/EmergencyDetectRequest"
+            example:
+              patient_id: "PT-2024-001234"
+              text: "I have severe chest pain and trouble breathing"
+              text_hash: "a3f5b8c9d2e1f4g7h6i5j8k1l0m9n2o5"
       responses:
         '200':
           description: Emergency detection result.
@@ -83,6 +88,14 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/GuardrailCheckRequest"
+            example:
+              patient_id: "PT-2024-001234"
+              text: "When is my next appointment with Dr. Smith?"
+              context:
+                has_appointments: true
+                has_prescriptions: false
+                practice_name: "AHP Family Medicine"
+              message_id: "msg-2024-abc123"
       responses:
         '200':
           description: Guardrail decision output.
@@ -105,6 +118,13 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/RoutingCreateRequest"
+            example:
+              patient_id: "PT-2024-001234"
+              category: "scheduling"
+              message_hash: "hash_abc123xyz789"
+              metadata:
+                priority: "normal"
+                source: "patient_portal"
       responses:
         '200':
           description: Routing ticket created.
@@ -127,6 +147,17 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/AuditEvent"
+            example:
+              event_type: "guardrail_check"
+              patient_id_hash: "hash_pt_001234"
+              message_id: "msg-2024-abc123"
+              timestamp: "2024-12-17T13:45:00Z"
+              patterns: ["appointment_inquiry"]
+              confidence: 0.95
+              action: "ALLOW"
+              details:
+                response_approved: true
+                review_required: false
       responses:
         '200':
           description: Audit entry accepted.
@@ -149,6 +180,7 @@ paths:
           required: true
           schema:
             type: string
+          example: "PT-2024-001234"
       responses:
         '200':
           description: Existence check.
@@ -168,6 +200,7 @@ paths:
           required: true
           schema:
             type: string
+          example: "PT-2024-001234"
       responses:
         '200':
           description: Existence check.
@@ -210,12 +243,15 @@ components:
       properties:
         consent_granted:
           type: boolean
+          example: true
         consent_id:
           type: string
           nullable: true
+          example: "consent-2024-abc123"
         timestamp:
           type: string
           format: date-time
+          example: "2024-12-17T13:45:00Z"
 
     #############################################
     # EMERGENCY DETECTION
@@ -237,14 +273,18 @@ components:
       properties:
         is_emergency:
           type: boolean
+          example: true
         patterns:
           type: array
           items:
             type: string
+          example: ["chest_pain", "breathing_difficulty"]
         confidence:
           type: number
+          example: 0.98
         text_hash:
           type: string
+          example: "a3f5b8c9d2e1f4g7h6i5j8k1l0m9n2o5"
 
     #############################################
     # GUARDRAIL PIPELINE
@@ -316,11 +356,14 @@ components:
       properties:
         routing_id:
           type: string
+          example: "route-2024-xyz789"
         status:
           type: string
+          example: "pending"
         assigned_to:
           type: string
           nullable: true
+          example: "scheduling_team"
 
     #############################################
     # AUDIT
@@ -356,8 +399,10 @@ components:
       properties:
         audit_id:
           type: string
+          example: "audit-2024-def456"
         status:
           type: string
+          example: "logged"
 
     #############################################
     # EHR READ-ONLY RESPONSES
@@ -367,13 +412,16 @@ components:
       properties:
         exists:
           type: boolean
+          example: true
         date:
           type: string
           format: date
           nullable: true
+          example: "2024-12-20"
 
     PrescriptionExistsResponse:
       type: object
       properties:
         exists:
           type: boolean
+          example: false

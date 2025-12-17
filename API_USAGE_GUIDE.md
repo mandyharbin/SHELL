@@ -8,12 +8,13 @@
 1. Open `api-docs.html` in any web browser (Chrome, Firefox, Safari, etc.)
 2. That's it! You'll see interactive API documentation
 
-### Option 2: Online Viewer (No Installation)
+### Option 2: Online Viewer with Test Data (No Installation)
 
 1. Go to **https://editor.swagger.io**
 2. Click **File** → **Import file**
 3. Select `openapi.yaml` from this folder
 4. Browse the interactive API documentation
+5. **Try it out!** All endpoints have example data pre-filled (use patient ID: `PT-2024-001234`)
 
 ---
 
@@ -56,6 +57,7 @@ Use the interactive docs to understand request/response formats
 - **What data does each endpoint need?** Check the "Request Body" section in the docs
 - **What will the API return?** Check the "Responses" section in the docs
 - **What are the action types?** See the "Schemas" section for EMERGENCY, BLOCK, ROUTE_PROMPT, ROUTE_AUTOSEND, ALLOW
+- **Need a test patient ID?** Use `PT-2024-001234` - all examples in Swagger use this ID
 
 ---
 
