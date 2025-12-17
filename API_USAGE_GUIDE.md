@@ -16,6 +16,14 @@
 4. Browse the interactive API documentation
 5. **Try it out!** All endpoints have example data pre-filled (use patient ID: `PT-2024-001234`)
 
+### Option 3: Run Mock Server for Real Testing ⭐
+
+Want to actually execute API calls and get responses?
+
+**See [`MOCK_SERVER_GUIDE.md`](MOCK_SERVER_GUIDE.md) for step-by-step instructions**
+
+This lets you test the API as if it were real - perfect for frontend development!
+
 ---
 
 ## 📋 What's In This API?
