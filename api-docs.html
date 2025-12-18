@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AHP Guardrail Engine API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-left: 4px solid #1a73e8;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        
+        h2 {
+            color: #1a73e8;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .endpoint {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+        
+        .method.get {
+            background: #61affe;
+            color: white;
+        }
+        
+        .method.post {
+            background: #49cc90;
+            color: white;
+        }
+        
+        .path {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .description {
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        .schema {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .schema-name {
+            font-weight: bold;
+            color: #1a73e8;
+            margin-bottom: 10px;
+        }
+        
+        .property {
+            margin-left: 20px;
+            padding: 5px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .required {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        
+        .enum {
+            background: #fff3e0;
+            padding: 10px;
+            border-left: 3px solid #ff9800;
+            margin: 10px 0;
+        }
+        
+        .enum-value {
+            display: inline-block;
+            background: white;
+            padding: 3px 8px;
+            margin: 3px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 3px 10px;
+            border-radius: 3px;
+            margin: 5px 5px 5px 0;
+            font-size: 0.85em;
+        }
+        
+        .online-link {
+            background: #4caf50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .online-link:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ AHP Guardrail Engine API</h1>
+        <p class="subtitle">Version 1.0.0 • Central policy enforcement for Patient-Facing AI Assistant</p>
+        
+        <div class="info-box">
+            <strong>📖 View Interactive Documentation:</strong><br>
+            For full interactive API exploration, upload <code>openapi.yaml</code> to 
+            <a href="https://editor.swagger.io" target="_blank" class="online-link">Swagger Editor →</a>
+        </div>
+
+        <h2>📋 Overview</h2>
+        <p>Central policy enforcement engine handling consent verification, emergency detection, forbidden intent classification, routing determination, pre-LLM sanitization, post-LLM validation, and audit event creation.</p>
+        
+        <p><strong>Server:</strong> <code>https://api.ahp.internal</code> (Internal cluster)</p>
+
+        <h2>🔌 API Endpoints</h2>
+
+        <h3>🔒 Consent & Safety</h3>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/v1/consent/verify</span>
+                <span class="tag">Consent</span>
+            </div>
+            <div class="description">
+                Verify whether user has granted data-backed AI consent.
+                <div class="schema">
+                    <strong>Query Parameters:</strong>
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> ConsentResponse
+                    <div class="property">• consent_granted (boolean)</div>
+                    <div class="property">• consent_id (string, nullable)</div>
+                    <div class="property">• timestamp (date-time)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/v1/emergency/detect</span>
+                <span class="tag">Emergency Detection</span>
+            </div>
+            <div class="description">
+                Detect whether a message is an emergency using rules + ML.
+                <div class="schema">
+                    <strong>Request Body:</strong> EmergencyDetectRequest
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                    <div class="property"><span class="required">* </span>text (string)</div>
+                    <div class="property">• text_hash (string) - SHA-256 or similar hash</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> EmergencyDetectResponse
+                    <div class="property">• is_emergency (boolean)</div>
+                    <div class="property">• patterns (array of strings)</div>
+                    <div class="property">• confidence (number)</div>
+                    <div class="property">• text_hash (string)</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>🛡️ Core Guardrail Pipeline</h3>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/v1/guardrail/check</span>
+                <span class="tag">Guardrails</span>
+            </div>
+            <div class="description">
+                Run full guardrail decision pipeline: consent check → emergency → forbidden → routing → allowed recommendation.
+                <div class="schema">
+                    <strong>Request Body:</strong> GuardrailCheckRequest
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                    <div class="property"><span class="required">* </span>text (string)</div>
+                    <div class="property">• context (object) - Sanitized context data</div>
+                    <div class="property">• message_id (string)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> GuardrailCheckResponse
+                    <div class="property">• action (ActionType enum)</div>
+                    <div class="property">• action_reason (string)</div>
+                    <div class="property">• confidence (number)</div>
+                    <div class="property">• recommendation (object, nullable)</div>
+                    <div class="property">• audit_event_id (string)</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>📨 Routing & Audit</h3>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/v1/routing/create</span>
+                <span class="tag">Routing</span>
+            </div>
+            <div class="description">
+                Create a routing ticket for staff inbox.
+                <div class="schema">
+                    <strong>Request Body:</strong> RoutingCreateRequest
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                    <div class="property"><span class="required">* </span>category (string) - e.g., "scheduling", "clinical", "billing"</div>
+                    <div class="property"><span class="required">* </span>message_hash (string)</div>
+                    <div class="property">• metadata (object, nullable)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> RoutingCreateResponse
+                    <div class="property">• routing_id (string)</div>
+                    <div class="property">• status (string)</div>
+                    <div class="property">• assigned_to (string, nullable)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method post">POST</span>
+                <span class="path">/v1/audit/log</span>
+                <span class="tag">Audit</span>
+            </div>
+            <div class="description">
+                Submit a signed audit event (tamper-evident event payload).
+                <div class="schema">
+                    <strong>Request Body:</strong> AuditEvent
+                    <div class="property"><span class="required">* </span>event_type (string)</div>
+                    <div class="property"><span class="required">* </span>message_id (string)</div>
+                    <div class="property"><span class="required">* </span>timestamp (date-time)</div>
+                    <div class="property">• patient_id_hash (string)</div>
+                    <div class="property">• patterns (array of strings)</div>
+                    <div class="property">• confidence (number)</div>
+                    <div class="property">• action (ActionType enum)</div>
+                    <div class="property">• details (object, nullable)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> AuditResponse
+                    <div class="property">• audit_id (string)</div>
+                    <div class="property">• status (string)</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>🏥 EHR Read-Only Adapter</h3>
+        
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/ehr/appointments/exists</span>
+                <span class="tag">EHR Read-Only</span>
+            </div>
+            <div class="description">
+                Check if appointment exists for patient.
+                <div class="schema">
+                    <strong>Query Parameters:</strong>
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> AppointmentExistsResponse
+                    <div class="property">• exists (boolean)</div>
+                    <div class="property">• date (date, nullable)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div>
+                <span class="method get">GET</span>
+                <span class="path">/ehr/prescriptions/exists</span>
+                <span class="tag">EHR Read-Only</span>
+            </div>
+            <div class="description">
+                Check if prescription exists for patient.
+                <div class="schema">
+                    <strong>Query Parameters:</strong>
+                    <div class="property"><span class="required">* </span>patient_id (string)</div>
+                </div>
+                <div class="schema">
+                    <strong>Response 200:</strong> PrescriptionExistsResponse
+                    <div class="property">• exists (boolean)</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>📊 Data Schemas</h2>
+
+        <h3>Enumerations</h3>
+        
+        <div class="enum">
+            <div class="schema-name">ActionType</div>
+            <div>Possible values:</div>
+            <span class="enum-value">EMERGENCY</span>
+            <span class="enum-value">BLOCK</span>
+            <span class="enum-value">ROUTE_PROMPT</span>
+            <span class="enum-value">ROUTE_AUTOSEND</span>
+            <span class="enum-value">ALLOW</span>
+        </div>
+
+        <div class="enum">
+            <div class="schema-name">HandoverReason</div>
+            <div>Possible values:</div>
+            <span class="enum-value">No Match Found</span>
+            <span class="enum-value">Low Confidence Match</span>
+            <span class="enum-value">Unsafe Clinical Question</span>
+            <span class="enum-value">Requires Human Review</span>
+            <span class="enum-value">Billing or Account Issue</span>
+            <span class="enum-value">Ambiguous or Multi-Part Question</span>
+        </div>
+
+        <h2>🚀 Getting Started</h2>
+        <p>See <code>API_USAGE_GUIDE.md</code> for detailed instructions on:</p>
+        <ul style="margin-left: 40px; margin-top: 10px;">
+            <li>Generating API clients in multiple languages</li>
+            <li>Creating server stubs</li>
+            <li>Running mock servers for testing</li>
+            <li>Viewing full interactive documentation</li>
+        </ul>
+
+    </div>
+</body>
+</html>

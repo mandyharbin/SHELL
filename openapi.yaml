@@ -1,0 +1,427 @@
+openapi: 3.1.0
+info:
+  title: AHP Guardrail Engine API
+  description: >
+    Central policy enforcement engine for the AHP Patient-Facing AI Assistant.
+    Handles consent verification, emergency detection, forbidden intent classification,
+    routing determination, pre-LLM sanitization, post-LLM validation, and audit event creation.
+  version: 1.0.0
+  contact:
+    name: AHP Platform Team
+
+servers:
+  - url: https://api.ahp.internal
+    description: Internal cluster
+
+tags:
+  - name: Guardrails
+  - name: Emergency Detection
+  - name: Consent
+  - name: Routing
+  - name: Audit
+  - name: EHR Read-Only
+
+paths:
+
+  #############################################
+  # CONSENT
+  #############################################
+  /v1/consent/verify:
+    get:
+      tags: [Consent]
+      summary: Verify whether user has granted data-backed AI consent.
+      operationId: verifyConsent
+      parameters:
+        - in: query
+          name: patient_id
+          required: true
+          schema:
+            type: string
+          example: "PT-2024-001234"
+      responses:
+        '200':
+          description: Consent verification result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentResponse"
+
+  #############################################
+  # EMERGENCY DETECTION
+  #############################################
+  /v1/emergency/detect:
+    post:
+      tags: [Emergency Detection]
+      summary: Detect whether a message is an emergency using rules + ML.
+      operationId: detectEmergency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmergencyDetectRequest"
+            example:
+              patient_id: "PT-2024-001234"
+              text: "I have severe chest pain and trouble breathing"
+              text_hash: "a3f5b8c9d2e1f4g7h6i5j8k1l0m9n2o5"
+      responses:
+        '200':
+          description: Emergency detection result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmergencyDetectResponse"
+
+  #############################################
+  # GUARDRAIL CHECK (CORE PIPELINE ENTRYPOINT)
+  #############################################
+  /v1/guardrail/check:
+    post:
+      tags: [Guardrails]
+      summary: >
+        Run full guardrail decision pipeline:
+        consent check → emergency → forbidden → routing → allowed recommendation.
+      operationId: guardrailCheck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuardrailCheckRequest"
+            example:
+              patient_id: "PT-2024-001234"
+              text: "When is my next appointment with Dr. Smith?"
+              context:
+                has_appointments: true
+                has_prescriptions: false
+                practice_name: "AHP Family Medicine"
+              message_id: "msg-2024-abc123"
+      responses:
+        '200':
+          description: Guardrail decision output.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GuardrailCheckResponse"
+
+  #############################################
+  # ROUTING SERVICE
+  #############################################
+  /v1/routing/create:
+    post:
+      tags: [Routing]
+      summary: Create a routing ticket for staff inbox.
+      operationId: createRoutingTicket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoutingCreateRequest"
+            example:
+              patient_id: "PT-2024-001234"
+              category: "scheduling"
+              message_hash: "hash_abc123xyz789"
+              metadata:
+                priority: "normal"
+                source: "patient_portal"
+      responses:
+        '200':
+          description: Routing ticket created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoutingCreateResponse"
+
+  #############################################
+  # AUDIT
+  #############################################
+  /v1/audit/log:
+    post:
+      tags: [Audit]
+      summary: Submit a signed audit event.
+      operationId: submitAuditEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuditEvent"
+            example:
+              event_type: "guardrail_check"
+              patient_id_hash: "hash_pt_001234"
+              message_id: "msg-2024-abc123"
+              timestamp: "2024-12-17T13:45:00Z"
+              patterns: ["appointment_inquiry"]
+              confidence: 0.95
+              action: "ALLOW"
+              details:
+                response_approved: true
+                review_required: false
+      responses:
+        '200':
+          description: Audit entry accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditResponse"
+
+  #############################################
+  # EHR READ-ONLY ADAPTER
+  #############################################
+  /ehr/appointments/exists:
+    get:
+      tags: [EHR Read-Only]
+      summary: Check if appointment exists for patient.
+      operationId: appointmentExists
+      parameters:
+        - in: query
+          name: patient_id
+          required: true
+          schema:
+            type: string
+          example: "PT-2024-001234"
+      responses:
+        '200':
+          description: Existence check.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentExistsResponse"
+
+  /ehr/prescriptions/exists:
+    get:
+      tags: [EHR Read-Only]
+      summary: Check if prescription exists for patient.
+      operationId: prescriptionExists
+      parameters:
+        - in: query
+          name: patient_id
+          required: true
+          schema:
+            type: string
+          example: "PT-2024-001234"
+      responses:
+        '200':
+          description: Existence check.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrescriptionExistsResponse"
+
+components:
+
+  #############################################
+  # ENUMS
+  #############################################
+  schemas:
+
+    ActionType:
+      type: string
+      enum:
+        - EMERGENCY
+        - BLOCK
+        - ROUTE_PROMPT
+        - ROUTE_AUTOSEND
+        - ALLOW
+
+    HandoverReason:
+      type: string
+      enum:
+        - No Match Found
+        - Low Confidence Match
+        - Unsafe Clinical Question
+        - Requires Human Review
+        - Billing or Account Issue
+        - Ambiguous or Multi-Part Question
+
+    #############################################
+    # CONSENT
+    #############################################
+    ConsentResponse:
+      type: object
+      properties:
+        consent_granted:
+          type: boolean
+          example: true
+        consent_id:
+          type: string
+          nullable: true
+          example: "consent-2024-abc123"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-12-17T13:45:00Z"
+
+    #############################################
+    # EMERGENCY DETECTION
+    #############################################
+    EmergencyDetectRequest:
+      type: object
+      required: [patient_id, text]
+      properties:
+        patient_id:
+          type: string
+        text:
+          type: string
+        text_hash:
+          type: string
+          description: SHA-256 or similar hash, optional.
+
+    EmergencyDetectResponse:
+      type: object
+      properties:
+        is_emergency:
+          type: boolean
+          example: true
+        patterns:
+          type: array
+          items:
+            type: string
+          example: ["chest_pain", "breathing_difficulty"]
+        confidence:
+          type: number
+          example: 0.98
+        text_hash:
+          type: string
+          example: "a3f5b8c9d2e1f4g7h6i5j8k1l0m9n2o5"
+
+    #############################################
+    # GUARDRAIL PIPELINE
+    #############################################
+    GuardrailCheckRequest:
+      type: object
+      required: [patient_id, text]
+      properties:
+        patient_id:
+          type: string
+        text:
+          type: string
+        context:
+          type: object
+          description: >
+            Sanitized context including appointments, meds, practice info,
+            and knowledge hub matches (hashed or redacted where needed).
+        message_id:
+          type: string
+
+    GuardrailCheckResponse:
+      type: object
+      properties:
+        action:
+          $ref: "#/components/schemas/ActionType"
+        action_reason:
+          type: string
+        confidence:
+          type: number
+        recommendation:
+          type: object
+          nullable: true
+          properties:
+            response_text:
+              type: string
+              description: >
+                For ALLOW: sanitized text for LLM or AIRE-approved output.
+                For BLOCK/ROUTE: deterministic message template.
+            route_payload:
+              type: object
+              nullable: true
+              description: Info needed for routing ticket.
+            handover_reason:
+              $ref: "#/components/schemas/HandoverReason"
+              description: Reason for handover when action is ROUTE_PROMPT or ROUTE_AUTOSEND.
+        audit_event_id:
+          type: string
+
+    #############################################
+    # ROUTING SERVICE
+    #############################################
+    RoutingCreateRequest:
+      type: object
+      required: [patient_id, category, message_hash]
+      properties:
+        patient_id:
+          type: string
+        category:
+          type: string
+          description: e.g., "scheduling", "clinical", "billing"
+        message_hash:
+          type: string
+        metadata:
+          type: object
+          nullable: true
+
+    RoutingCreateResponse:
+      type: object
+      properties:
+        routing_id:
+          type: string
+          example: "route-2024-xyz789"
+        status:
+          type: string
+          example: "pending"
+        assigned_to:
+          type: string
+          nullable: true
+          example: "scheduling_team"
+
+    #############################################
+    # AUDIT
+    #############################################
+    AuditEvent:
+      type: object
+      required: [event_type, message_id, timestamp]
+      description: Signed, tamper-evident event payload.
+      properties:
+        event_type:
+          type: string
+        patient_id_hash:
+          type: string
+        message_id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        patterns:
+          type: array
+          items:
+            type: string
+        confidence:
+          type: number
+        action:
+          $ref: "#/components/schemas/ActionType"
+        details:
+          type: object
+          nullable: true
+
+    AuditResponse:
+      type: object
+      properties:
+        audit_id:
+          type: string
+          example: "audit-2024-def456"
+        status:
+          type: string
+          example: "logged"
+
+    #############################################
+    # EHR READ-ONLY RESPONSES
+    #############################################
+    AppointmentExistsResponse:
+      type: object
+      properties:
+        exists:
+          type: boolean
+          example: true
+        date:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-12-20"
+
+    PrescriptionExistsResponse:
+      type: object
+      properties:
+        exists:
+          type: boolean
+          example: false
